@@ -17,6 +17,7 @@
 package com.example.android.guesstheword.screens.game;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.android.guesstheword.databinding.GameFragmentBinding;
 
@@ -54,6 +56,8 @@ public class GameFragment extends Fragment {
         mBinding = GameFragmentBinding.inflate(inflater);
         resetList();
         nextWord();
+        GameViewModel viewModel = new ViewModelProvider(this).get(GameViewModel.class);
+        Log.i("GameFragment", "Called ViewModelProvider.get");
         mBinding.correctButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
