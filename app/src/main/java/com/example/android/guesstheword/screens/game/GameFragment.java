@@ -26,7 +26,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.android.guesstheword.R;
 import com.example.android.guesstheword.databinding.GameFragmentBinding;
 
 import java.util.ArrayList;
@@ -39,105 +41,57 @@ import java.util.List;
  */
 public class GameFragment extends Fragment {
 
-    // The current word
-    private String mWord;
-
-    // The current score
-    private int mScore;
-
-    // The list of words - the front of the list is the next word to guess
-    private List<String> mWordList;
-
     private GameFragmentBinding mBinding;
+    private GameViewModel mViewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = GameFragmentBinding.inflate(inflater);
-        resetList();
-        nextWord();
-        GameViewModel viewModel = new ViewModelProvider(this).get(GameViewModel.class);
-        Log.i("GameFragment", "Called ViewModelProvider.get");
+        mViewModel = new ViewModelProvider(this).get(GameViewModel.class);
         mBinding.correctButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onCorrect();
+                mViewModel.onCorrect();
+                updated();
             }
         });
         mBinding.skipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onSkip();
+                mViewModel.onSkip();
+                updated();
             }
         });
-        updateScoreText();
-        updateWordText();
+        mBinding.endGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameFinished();
+            }
+        });
+        updated();
         return mBinding.getRoot();
     }
 
-
-    /**
-     * Resets the list of words and randomizes the order
-     */
-    private void resetList() {
-        mWordList = new ArrayList<>(Arrays.asList(
-                "queen",
-                "hospital",
-                "basketball",
-                "cat",
-                "change",
-                "snail",
-                "soup",
-                "calendar",
-                "sad",
-                "desk",
-                "guitar",
-                "home",
-                "railway",
-                "zebra",
-                "jelly",
-                "car",
-                "crow",
-                "trade",
-                "bag",
-                "roll",
-                "bubble"
-        ));
-        Collections.shuffle(mWordList);
+    private void gameFinished() {
+        GameFragmentDirections.ActionGameToScore action = GameFragmentDirections.actionGameToScore();
+        action.setScore(mViewModel.getScore());
+        NavHostFragment.findNavController(this).navigate(action);
     }
 
-    /** Methods for buttons presses **/
-
-    private void onSkip() {
-        mScore--;
-        nextWord();
-    }
-
-    private void onCorrect() {
-        mScore++;
-        nextWord();
-    }
-
-    /**
-     * Moves to the next word in the list
-     */
-    private void nextWord() {
-        if (!mWordList.isEmpty()) {
-            //Select and remove a word from the list
-            mWord = mWordList.remove(0);
-        }
-        updateWordText();
+    private void updated() {
         updateScoreText();
+        updateWordText();
     }
 
 
     /** Methods for updating the UI **/
 
     private void updateWordText() {
-        mBinding.wordText.setText(mWord);
+        mBinding.wordText.setText(mViewModel.getWord());
     }
 
     private void updateScoreText() {
-        mBinding.scoreText.setText(String.valueOf(mScore));
+        mBinding.scoreText.setText(String.valueOf(mViewModel.getScore()));
     }
 }
