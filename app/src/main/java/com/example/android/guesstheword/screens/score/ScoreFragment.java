@@ -25,6 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.android.guesstheword.R;
 import com.example.android.guesstheword.databinding.ScoreFragmentBinding;
 
@@ -33,8 +35,10 @@ public class ScoreFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ScoreFragmentBinding binding = ScoreFragmentBinding.inflate(inflater);
-        getArguments();
-        binding.scoreText.setText();
+        int score = ScoreFragmentArgs.fromBundle(getArguments()).getScore();
+        ScoreViewModelFactory factory = new ScoreViewModelFactory(score);
+        ScoreViewModel model = new ViewModelProvider(this, factory).get(ScoreViewModel.class);
+        binding.scoreText.setText(String.valueOf(model.getScore()));
         return binding.getRoot();
     }
 }
